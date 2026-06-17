@@ -1,0 +1,8 @@
+# PATTERN DOCTOR - DESIGN PATTERN PICKER- Expert System
+# Knowledge Base Systems Course - Damascus University
+# Faculty of Information Engineering / Prof. George Anwar Karaz
+#
+# Single dependency: the "experta" rule engine (a maintained fork of pyknow
+# implementing the Rete algorithm). No other libraries are required for Step 1.
+
+experta>=2.0.0
