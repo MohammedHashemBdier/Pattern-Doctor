@@ -1,11 +1,18 @@
 import subprocess
 import sys
 import os
+import arabic_reshaper
+from bidi.algorithm import get_display
 
 """
 Automated Test Script for Design Pattern Picker (Venv-Aware)
 ============================================================
 """
+
+def ar_print(text):
+    reshaped = arabic_reshaper.reshape(text)
+    bidi_text = get_display(reshaped)
+    print(bidi_text)
 
 def get_python_executable():
     """
@@ -19,23 +26,23 @@ def get_python_executable():
     venv_python = os.path.join(current_dir, "venv", "Scripts", "python.exe")
     
     if os.path.exists(venv_python):
-        print(f"[INFO] Using Venv Python: {venv_python}")
+        ar_print(f"[INFO] Using Venv Python: {venv_python}")
         return venv_python
     else:
-        print(f"[WARNING] Could not find venv at: {venv_python}")
-        print(f"[WARNING] Falling back to System Python: {sys.executable}")
-        print("[WARNING] This might cause the 'frozendict' error if not fixed globally.")
+        ar_print(f"[WARNING] Could not find venv at: {venv_python}")
+        ar_print(f"[WARNING] Falling back to System Python: {sys.executable}")
+        ar_print("[WARNING] This might cause the 'frozendict' error if not fixed globally.")
         return sys.executable
 
 def run_scenario(name, inputs):
     separator = f"{'#'*60}"
-    print(f"\n{separator}")
-    print(f"# SCENARIO: Testing '{name}'")
-    print(f"{'#'*60}\n")
+    ar_print(f"\n{separator}")
+    ar_print(f"# SCENARIO: Testing '{name}'")
+    ar_print(f"{'#'*60}\n")
 
     script_path = "run.py"
     if not os.path.exists(script_path):
-        print(f"Error: Could not find {script_path}.")
+        ar_print(f"Error: Could not find {script_path}.")
         return False
 
     # تحديد نسخة بايثون الصحيحة
@@ -59,23 +66,23 @@ def run_scenario(name, inputs):
         input_data = "\n".join(inputs) + "\n"
         stdout, stderr = process.communicate(input=input_data, timeout=10)
         
-        print(stdout)
+        ar_print(stdout)
         
         if stderr:
             # نطبع الأخطاء فقط إذا وجدنا نصاً حقيقياً فيها (تجاهل تحذيرات بايثون المزعجة أحياناً)
             stderr_clean = stderr.strip()
             if stderr_clean and "DeprecationWarning" not in stderr_clean:
-                print("!!! ERRORS/WARNINGS !!!")
-                print(stderr)
+                ar_print("!!! ERRORS/WARNINGS !!!")
+                ar_print(stderr)
             
         return process.returncode == 0
         
     except subprocess.TimeoutExpired:
         process.kill()
-        print("Error: Program timed out.")
+        ar_print("Error: Program timed out.")
         return False
     except Exception as e:
-        print(f"Unexpected Error: {e}")
+        ar_print(f"Unexpected Error: {e}")
         return False
 
 # تعريف الحالات
@@ -97,7 +104,7 @@ scenarios = {
 }
 
 # التنفيذ
-print("Starting Automated Testing (Venv-Aware + UTF-8 Fixed)...")
+ar_print("Starting Automated Testing (Venv-Aware + UTF-8 Fixed)...")
 
 results = {}
 for name, inputs in scenarios.items():
@@ -105,19 +112,19 @@ for name, inputs in scenarios.items():
     results[name] = success
 
 # التقرير النهائي
-print(f"\n{'='*60}")
-print("FINAL TEST REPORT")
-print(f"{'='*60}")
+ar_print(f"\n{'='*60}")
+ar_print("FINAL TEST REPORT")
+ar_print(f"{'='*60}")
 
 all_passed = True
 for name, success in results.items():
     status = "✅ PASS" if success else "❌ FAIL"
-    print(f"{name:<30} {status}")
+    ar_print(f"{name:<30} {status}")
     if not success:
         all_passed = False
 
-print(f"{'='*60}")
+ar_print(f"{'='*60}")
 if all_passed:
-    print("RESULT: ALL TESTS PASSED!")
+    ar_print("RESULT: ALL TESTS PASSED!")
 else:
-    print("RESULT: SOME TESTS FAILED.")
+    ar_print("RESULT: SOME TESTS FAILED.")

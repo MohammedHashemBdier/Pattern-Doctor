@@ -6,3 +6,5 @@
 # implementing the Rete algorithm). No other libraries are required for Step 1.
 
 experta>=2.0.0
+arabic-reshaper
+python-bidi

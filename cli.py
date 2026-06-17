@@ -47,6 +47,8 @@ returns nothing.)
 """
 
 import sys
+import arabic_reshaper
+from bidi.algorithm import get_display
 
 from experta import KnowledgeEngine
 
@@ -56,6 +58,16 @@ from facts import (
 )
 from knowledge_base import DesignPatternPicker
 from patterns import PATTERNS
+
+
+# ============================================================
+# Helper function for printing Arabic text correctly
+# ============================================================
+def ar_print(text):
+    """Print text after reshaping Arabic characters and applying bidirectional algorithm."""
+    reshaped = arabic_reshaper.reshape(text)
+    bidi_text = get_display(reshaped)
+    print(bidi_text)
 
 
 # ============================================================
@@ -189,13 +201,13 @@ def _question_text(engine, qid, lang):
 # Language selection (recursion + dict lookup, no if/else)
 # ============================================================
 def _select_language():
-    print(_UI['lang_prompt']['en'])
+    ar_print(_UI['lang_prompt']['en'])
     raw = input('>>> ').strip().lower()
     return _LANG_MAP.get(raw) or _reselect_language()
 
 
 def _reselect_language():
-    print(_UI['lang_invalid']['en'])
+    ar_print(_UI['lang_invalid']['en'])
     return _select_language()
 
 
@@ -205,13 +217,13 @@ def _reselect_language():
 def _prompt_answer(engine, pq, lang):
     qid = pq['qid']
     text = _question_text(engine, qid, lang)
-    print('\n' + text + '  ' + _UI['answer_hint'][lang])
+    ar_print('\n' + text + '  ' + _UI['answer_hint'][lang])
     raw = input('>>> ').strip().lower()
     return _ANSWER_MAP.get(raw) or _reask(engine, pq, lang)
 
 
 def _reask(engine, pq, lang):
-    print(_UI['answer_invalid'][lang])
+    ar_print(_UI['answer_invalid'][lang])
     return _prompt_answer(engine, pq, lang)
 
 
@@ -247,34 +259,34 @@ def _present_result(engine, lang):
     info = PATTERNS[name]
     name_disp = _pick(lang, info['name_ar'], info['name_en'])
 
-    print('\n' + _UI['result_header'][lang])
-    print('  ' + _UI['pattern_label'][lang] + ': ' + name_disp)
-    print('  ' + _UI['category_label'][lang] + ': ' +
+    ar_print('\n' + _UI['result_header'][lang])
+    ar_print('  ' + _UI['pattern_label'][lang] + ': ' + name_disp)
+    ar_print('  ' + _UI['category_label'][lang] + ': ' +
           _CATEGORY[lang].get(rec['category'], rec['category']))
-    print('  ' + _UI['desc_label'][lang] + ': ' +
+    ar_print('  ' + _UI['desc_label'][lang] + ': ' +
           _pick(lang, info['desc_ar'], info['desc_en']))
 
-    print('\n' + _UI['why_header'][lang])
-    print(_pick(lang, info['why_ar'], info['why_en']))
+    ar_print('\n' + _UI['why_header'][lang])
+    ar_print(_pick(lang, info['why_ar'], info['why_en']))
 
-    print('\n' + _UI['trace_header'][lang])
+    ar_print('\n' + _UI['trace_header'][lang])
     _print_trace(expl['fired_rules'])
 
-    print('\n' + _UI['farewell'][lang])
+    ar_print('\n' + _UI['farewell'][lang])
 
 
 def _print_trace(steps):
     """Print each reasoning step — uses map (no for statement)."""
-    list(map(lambda s: print('    • ' + s), steps))
+    list(map(lambda s: ar_print('    • ' + s), steps))
 
 
 # ============================================================
 # Main entry point
 # ============================================================
 def main():
-    print(_UI['banner']['en'])
+    ar_print(_UI['banner']['en'])
     lang = _select_language()
-    print('\n' + _UI['banner'][lang] + '\n')
+    ar_print('\n' + _UI['banner'][lang] + '\n')
 
     engine = DesignPatternPicker()
     engine.reset()      # triggers @DefFacts → seeds SystemState, Context, Questions

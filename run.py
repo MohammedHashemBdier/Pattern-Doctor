@@ -10,6 +10,13 @@ Keeping it separate means cli.py contains ZERO ``if`` statements
 codebase is free of the forbidden constructs.
 """
 
+import sys
+import subprocess
+
+# Force UTF-8 encoding in Windows console
+if sys.platform == "win32":
+    subprocess.run("chcp 65001 > nul", shell=True)
+
 from cli import main
 
 main()
